@@ -35,3 +35,4 @@ class Week:
         self.friday = self.monday + timedelta(days=4)
         self.saturday = self.monday + timedelta(days=5)
         self.sunday = self.monday + timedelta(days=6)
+        
