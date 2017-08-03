@@ -23,6 +23,7 @@
 
 from .week import \
     Week, \
+    WeekDay, \
     get_day_of_the_week_from_date, \
     get_weekends_from_period, \
     get_first_weekend_after_date
