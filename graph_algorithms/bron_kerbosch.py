@@ -29,7 +29,7 @@ def get_cliques_bron_kerbosch(nodes):
     p = set(nodes)
     r = set()
     x = set()
-    return bron_kerbosch(r, p, x, True)
+    return bron_kerbosch(r, p, x, False)
 
 
 def bron_kerbosch(
