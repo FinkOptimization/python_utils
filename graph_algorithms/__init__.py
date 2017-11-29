@@ -26,3 +26,6 @@ from .node import \
 
 from .bron_kerbosch import \
     get_cliques_bron_kerbosch
+
+from .kou_stockmeyer_wong import \
+    get_cliques_kou_stockmeyer_wong

@@ -64,10 +64,9 @@ def bron_kerbosch(
                 if degree < smallest_index:
                     smallest_index = degree
             for _ in p:
-                i = smallest_index
-                while len(nodes_of_degree[i]) == 0:
-                    i += 1
-                node = nodes_of_degree[i].pop()
+                while len(nodes_of_degree[smallest_index]) == 0:
+                    smallest_index += 1
+                node = nodes_of_degree[smallest_index].pop()
                 node.visited = True
                 for n in node.adjacent:
                     if not n.visited:
