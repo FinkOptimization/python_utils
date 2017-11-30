@@ -55,8 +55,8 @@ def get_cliques_kou_stockmeyer_wong(nodes):
                 elif card == max_cardinality and m < min_m:
                     max_cardinality = card
                     min_m = m
-            temp_cliques.append((temp_cliques[m] & w) | {i})
-            w -= temp_cliques[m]
+            temp_cliques.append((temp_cliques[min_m] & w) | {i})
+            w -= temp_cliques[min_m]
     
     cliques = [set(nodes[i] for i in temp_cliques[0])]
     for k in range(1, len(temp_cliques)):
