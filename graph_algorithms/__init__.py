@@ -24,7 +24,9 @@
 from .node import \
     Node, \
     expected_maximal_cliques_in_random_graph, \
-    print_statistics
+    print_statistics, \
+    get_degeneracy_ordering, \
+    get_components
 
 from .bron_kerbosch import \
     get_cliques_bron_kerbosch

@@ -22,68 +22,40 @@
 # SOFTWARE.
 
 
-from . import Node
+from . import Node, get_degeneracy_ordering, get_components
 
 
 def get_cliques_bron_kerbosch(nodes):
-    p = set(nodes)
-    r = set()
-    x = set()
-    return bron_kerbosch(r, p, x, False)
+    for component in get_components(nodes):
+        p = set(component)
+        r = set()
+        x = set()
+        for v in get_degeneracy_ordering(component):
+            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x | v.adjacent):
+                yield clique
+            p.remove(v)
+            x.add(v)
 
 
 def bron_kerbosch(
         r,  # type: set[Node]
         p,  # type: set[Node]
         x,  # type: set[Node]
-        inner=False
 ):
     if len(p) == len(x) == 0:
         yield r
     else:
-        iter_nodes = set()
-        if inner:
-            px = p | x
-            u = px.pop()
-            adjacency = len([n for n in u.adjacent if n in p])
-            for node in px:
-                local_adjacency = len(node.adjacent & p)
-                if local_adjacency > adjacency:
-                    adjacency = local_adjacency
-                    u = node
-            iter_nodes.update(p - u.adjacent)
-        else:
-            max_degree = max(len(n.adjacent) for n in p)
-            nodes_of_degree = [set() for _ in range(max_degree + 1)]
-            smallest_index = len(p)
-            for node in p:
-                degree = len(node.adjacent)
-                nodes_of_degree[degree].add(node)
-                node.bron_kerbosch_cell_index = degree
-                node.visited = False
-                if degree < smallest_index:
-                    smallest_index = degree
-            for _ in p:
-                while len(nodes_of_degree[smallest_index]) == 0:
-                    smallest_index += 1
-                node = nodes_of_degree[smallest_index].pop()
-                node.visited = True
-                for n in node.adjacent:
-                    if not n.visited:
-                        nodes_of_degree[n.bron_kerbosch_cell_index].remove(n)
-                        n.bron_kerbosch_cell_index -= 1
-                        nodes_of_degree[n.bron_kerbosch_cell_index].add(n)
-                        if n.bron_kerbosch_cell_index < smallest_index:
-                            smallest_index = n.bron_kerbosch_cell_index
-                
-                iter_nodes.add(node)
-        
+        px = p | x
+        u = px.pop()
+        adjacency = len([n for n in u.adjacent if n in p])
+        for node in px:
+            local_adjacency = len(node.adjacent & p)
+            if local_adjacency > adjacency:
+                adjacency = local_adjacency
+                u = node
+        iter_nodes = p - u.adjacent
         for v in iter_nodes:
-            r_copy = set(r)
-            r_copy.add(v)
-            p_copy = p & v.adjacent
-            x_copy = x & v.adjacent
-            for clique in bron_kerbosch(r_copy, p_copy, x_copy, True):
+            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
                 yield clique
             p.remove(v)
             x.add(v)
