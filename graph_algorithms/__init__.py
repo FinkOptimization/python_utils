@@ -22,7 +22,9 @@
 # SOFTWARE.
 
 from .node import \
-    Node
+    Node, \
+    expected_maximal_cliques_in_random_graph, \
+    print_statistics
 
 from .bron_kerbosch import \
     get_cliques_bron_kerbosch
