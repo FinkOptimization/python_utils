@@ -99,7 +99,7 @@ def expected_maximal_cliques_in_random_graph(nodes: int, edge_probability: float
     return expected_maximal
 
 
-def get_degeneracy_ordering(nodes) -> [Node]:
+def get_degeneracy_ordering(nodes) -> (int, [Node]):
     max_degree = max(len(n.adjacent) for n in nodes)
     nodes_of_degree = [set() for _ in range(max_degree + 1)]
     smallest_index = len(nodes)
@@ -111,9 +111,12 @@ def get_degeneracy_ordering(nodes) -> [Node]:
         node.visited = False
         if degree < smallest_index:
             smallest_index = degree
+    degeneracy_number = 0
     for _ in nodes:
         while len(nodes_of_degree[smallest_index]) == 0:
             smallest_index += 1
+        if smallest_index > degeneracy_number:
+            degeneracy_number = smallest_index
         node = next(iter(nodes_of_degree[smallest_index]))
         nodes_of_degree[smallest_index].remove(node)
         node.visited = True
@@ -126,7 +129,7 @@ def get_degeneracy_ordering(nodes) -> [Node]:
                     smallest_index = n.degeneracy_cell_index
     
         degeneracy_ordering.append(node)
-    return degeneracy_ordering
+    return degeneracy_number, degeneracy_ordering
 
 
 def get_components(nodes) -> []:
