@@ -31,7 +31,7 @@ def get_cliques_bron_kerbosch(nodes):
         r = set()
         x = set()
         _, nodes_ordered = get_degeneracy_ordering(component)
-        for v in nodes:
+        for v in nodes_ordered:
             for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
                 yield clique
             p.remove(v)
