@@ -43,7 +43,7 @@ class WeekDay(Flag):
 
 class Week:
     def __init__(self, year: int, week: int):
-        self.monday = datetime.strptime('{:4d}-{:2d}-mon'.format(year, week), '%Y-%W-%a').date()
+        self.monday = datetime.strptime('{:4d}-{:d}-mon'.format(year, week), '%Y-%W-%a').date()
         if date(year, 1, 4).isoweekday() > 4:
             self.monday -= timedelta(days=7)
         self.tuesday = self.monday + timedelta(days=1)

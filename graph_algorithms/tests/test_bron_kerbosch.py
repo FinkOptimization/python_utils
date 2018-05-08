@@ -22,7 +22,9 @@
 # SOFTWARE.
 
 import unittest
-from .. import Node, get_cliques_bron_kerbosch
+import math
+
+from .. import Node, get_cliques_bron_kerbosch, get_degeneracy_ordering
 
 
 class TestBasicBronKerboschFunctionality(unittest.TestCase):
@@ -55,6 +57,11 @@ class TestBasicBronKerboschFunctionality(unittest.TestCase):
         nodes[4].adjacent.update({nodes[0], nodes[1], nodes[3]})
         nodes[5].adjacent.update({nodes[3]})
         number_of_cliques = 5
+        
+        d, _ = get_degeneracy_ordering(nodes)
+        
+        print("BronKerbosch worst case run time: O(d * n * 3 ^ (d / 3)) = {}".format(
+            d * len(nodes) * math.pow(3, d / 3)))
         
         cliques = [clique for clique in get_cliques_bron_kerbosch(nodes)]
         
