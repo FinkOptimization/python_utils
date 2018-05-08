@@ -92,3 +92,54 @@ def get_weekends_from_period(first_date: date, last_date: date) -> []:
         weekends.append(get_first_weekend_after_date(next_date))
         next_date += timedelta(days=7)
     return weekends
+
+
+def get_danish_name_of_weekday(week_day: WeekDay):
+    if week_day == WeekDay.monday:
+        return "Mandag"
+    elif week_day == WeekDay.tuesday:
+        return "Tirsdag"
+    elif week_day == WeekDay.wednesday:
+        return "Onsdag"
+    elif week_day == WeekDay.thursday:
+        return "Torsdag"
+    elif week_day == WeekDay.friday:
+        return "Fredag"
+    elif week_day == WeekDay.saturday:
+        return "Lørdag"
+    elif week_day == WeekDay.sunday:
+        return "Søndag"
+
+
+def get_danish_short_name_of_weekday(week_day: WeekDay):
+    if week_day == WeekDay.monday:
+        return "Man"
+    elif week_day == WeekDay.tuesday:
+        return "Tirs"
+    elif week_day == WeekDay.wednesday:
+        return "Ons"
+    elif week_day == WeekDay.thursday:
+        return "Tors"
+    elif week_day == WeekDay.friday:
+        return "Fre"
+    elif week_day == WeekDay.saturday:
+        return "Lør"
+    elif week_day == WeekDay.sunday:
+        return "Søn"
+
+
+def get_danish_very_short_name_of_weekday(week_day: WeekDay):
+    if week_day == WeekDay.monday:
+        return "Ma"
+    elif week_day == WeekDay.tuesday:
+        return "Ti"
+    elif week_day == WeekDay.wednesday:
+        return "On"
+    elif week_day == WeekDay.thursday:
+        return "To"
+    elif week_day == WeekDay.friday:
+        return "Fr"
+    elif week_day == WeekDay.saturday:
+        return "Lø"
+    elif week_day == WeekDay.sunday:
+        return "Sø"

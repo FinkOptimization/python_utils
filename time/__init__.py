@@ -26,4 +26,7 @@ from .week import \
     WeekDay, \
     get_day_of_the_week_from_date, \
     get_weekends_from_period, \
-    get_first_weekend_after_date
+    get_first_weekend_after_date, \
+    get_danish_name_of_weekday, \
+    get_danish_short_name_of_weekday, \
+    get_danish_very_short_name_of_weekday
