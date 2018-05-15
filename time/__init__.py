@@ -30,3 +30,7 @@ from .week import \
     get_danish_name_of_weekday, \
     get_danish_short_name_of_weekday, \
     get_danish_very_short_name_of_weekday
+
+from .holidays import \
+    get_danish_holidays, \
+    get_danish_public_holidays
