@@ -27,7 +27,7 @@ def _calculate_danish_easter(year: int) -> date:
     return date(year=year, month=month, day=day)
 
 
-def get_danish_holidays(year: int) -> []:
+def get_danish_holidays(year: int, include_constitution_day=False, include_workers_day=False) -> []:
     new_year = date(year=year, month=1, day=1)
     easter = _calculate_danish_easter(year)
     easter_monday = easter + timedelta(days=1)
@@ -37,10 +37,9 @@ def get_danish_holidays(year: int) -> []:
     ascension_day = maundy_thursday + timedelta(days=42)
     pentecost = easter + timedelta(days=49)
     whit_monday = pentecost + timedelta(days=1)
-    constitution_day = date(year=year, month=6, day=5)
     christmas_day = date(year=year, month=12, day=25)
     second_day_of_christmas = christmas_day + timedelta(days=1)
-    return sorted([
+    holidays = [
         (new_year, 'New Year', 'Nytår'),
         (easter, 'Easter Sunday', 'Påskedag'),
         (easter_monday, 'Easter Monday', 'Anden påskedag'),
@@ -50,31 +49,38 @@ def get_danish_holidays(year: int) -> []:
         (ascension_day, 'Ascension Day', 'Kristi himmelfartsdag'),
         (pentecost, 'Pentecost', 'Pinsedag'),
         (whit_monday, 'Whit Monday', 'Anden pinsedag'),
-        (constitution_day, 'Constitution Day', 'Grundlovsdag'),
         (christmas_day, 'Christmas Day', 'Juledag'),
         (second_day_of_christmas, 'Second Day of Christmas', 'Anden juledag')
-    ], key=lambda x: x[0])
+    ]
+    if include_constitution_day:
+        holidays.append((date(year=year, month=6, day=5), 'Constitution Day', 'Grundlovsdag'))
+    if include_workers_day:
+        holidays.append((date(year=year, month=5, day=1), "International Workers' Day", 'Arbejdernes kampdag'))
+    return sorted(holidays, key=lambda x: x[0])
 
 
-def get_danish_public_holidays(year: int) -> []:
+def get_danish_public_holidays(year: int, include_constitution_day=False, include_workers_day=False) -> []:
     return [holiday
-            for holiday in get_danish_holidays(year)
+            for holiday in get_danish_holidays(year, include_constitution_day, include_workers_day)
             if get_day_of_the_week_from_date(holiday[0]) in WeekDay.weekday]
 
 
-def get_danish_holidays_between_dates(first_date: date, second_date: date):
+def get_danish_holidays_between_dates(first_date: date, second_date: date,
+                                      include_constitution_day=False, include_workers_day=False):
     start_date = min(first_date, second_date)
     end_date = max(first_date, second_date)
 
     holidays = []
     for year in range(start_date.year, end_date.year + 1):
-        for holiday in get_danish_holidays(year):
+        for holiday in get_danish_holidays(year, include_constitution_day, include_workers_day):
             if start_date <= holiday[0] <= end_date:
                 holidays.append(holiday)
     return holidays
 
 
-def get_danish_public_holidays_between_dates(first_date: date, second_date: date):
+def get_danish_public_holidays_between_dates(first_date: date, second_date: date,
+                                             include_constitution_day=False, include_workers_day=False):
     return [holiday
-            for holiday in get_danish_holidays_between_dates(first_date, second_date)
+            for holiday in get_danish_holidays_between_dates(first_date, second_date,
+                                                             include_constitution_day, include_workers_day)
             if get_day_of_the_week_from_date(holiday[0]) in WeekDay.weekday]
