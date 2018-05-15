@@ -33,4 +33,6 @@ from .week import \
 
 from .holidays import \
     get_danish_holidays, \
-    get_danish_public_holidays
+    get_danish_public_holidays, \
+    get_danish_holidays_between_dates, \
+    get_danish_public_holidays_between_dates
