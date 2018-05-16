@@ -43,7 +43,11 @@ class WeekDay(Flag):
 
 class Week:
     def __init__(self, year: int, week: int):
-        self.monday = datetime.strptime('{:4d}-{:d}-mon'.format(year, week), '%Y-%W-%a').date()
+
+        self.year = year
+        self.week = week
+
+        self.monday = datetime.strptime('{:4d}-{:d}-mon'.format(self.year, self.week), '%Y-%W-%a').date()
         if date(year, 1, 4).isoweekday() > 4:
             self.monday -= timedelta(days=7)
         self.tuesday = self.monday + timedelta(days=1)
@@ -61,6 +65,9 @@ class Week:
             self.saturday,
             self.sunday
         ]
+
+    def __lt__(self, other):
+        return self.year < other.year or (self.year == other.year and self.week < other.week)
 
 
 def get_day_of_the_week_from_date(value: date) -> WeekDay:
