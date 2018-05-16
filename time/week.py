@@ -52,6 +52,15 @@ class Week:
         self.friday = self.monday + timedelta(days=4)
         self.saturday = self.monday + timedelta(days=5)
         self.sunday = self.monday + timedelta(days=6)
+        self.dates = [
+            self.monday,
+            self.tuesday,
+            self.wednesday,
+            self.thursday,
+            self.friday,
+            self.saturday,
+            self.sunday
+        ]
 
 
 def get_day_of_the_week_from_date(value: date) -> WeekDay:
