@@ -69,6 +69,11 @@ class Week:
     def __lt__(self, other):
         return self.year < other.year or (self.year == other.year and self.week < other.week)
 
+    def __str__(self):
+        return "{},{}".format(self.year, self.week)
+
+    __repr__ = __str__
+
 
 def get_day_of_the_week_from_date(value: date) -> WeekDay:
     return WeekDay(1 << value.weekday())
