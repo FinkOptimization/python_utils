@@ -66,6 +66,11 @@ class Week:
             self.sunday
         ]
 
+    def add_weeks(self, weeks: int):
+        monday = self.monday + timedelta(days=7) * weeks
+        year_week = monday.isocalendar()
+        return Week(year_week[0], year_week[1])
+
     def __lt__(self, other):
         return self.year < other.year or (self.year == other.year and self.week < other.week)
 
