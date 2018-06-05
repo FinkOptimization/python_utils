@@ -2,6 +2,9 @@ import subprocess
 import os
 import hashlib
 
+DEVELOPMENT_BRANCH = 'master'
+PRODUCTION_BRANCH = 'production'
+
 
 def last(x: int, offset=0):
     if x <= 0:
@@ -69,14 +72,13 @@ def git_version():
         # the commit identifier of the branch
         if branch not in ['master', 'production']:
             out = _minimal_ext_cmd(['git', 'log', branch, '^master', '--format="%h"'])
-            commits = len(out.strip().decode('utf-8').split('\n'))
+            branch_commits = len(out.strip().decode('utf-8').split('\n'))
 
             # Convert the branch name into a four-digit hashed value. Use the hashlib for consistency
             branch = int(hashlib.sha1(branch.encode('utf-8')).hexdigest(), 16) % 10 ** 4
-            branch_commits = n_pairing(commits, branch)
 
         if branch_commits > 0:
-            version = '{}.{}.{}.{}'.format(major, minor, revision, branch_commits)
+            version = '{}.{}.{}.{}-{}'.format(major, minor, revision, branch, branch_commits)
         elif revision > 0:
             version = '{}.{}.{}'.format(major, minor, revision)
         else:
