@@ -18,6 +18,13 @@ def n_pairing(x: int, y: int, c=50):
     return (start + step) * c + (y % c)
 
 
+def hash_branch_name(branch):
+    """Convert the branch name into a four-digit hashed value"""
+
+    # Use the hashlib for consistency
+    return int(hashlib.sha1(branch.encode('utf-8')).hexdigest(), 16) % 10 ** 4
+
+
 # Return the git revision as a string
 def git_version():
     def _minimal_ext_cmd(cmd):
@@ -40,49 +47,77 @@ def git_version():
         branch = out.strip().decode('ascii').lower()
 
         # Initialize the minor and revision to zero
-        minor = 0
+        major = 0
+        minor = 1
         revision = 0
-
-        # Get the version number from the 'production' branch. Use the number of commits as revision
-        out = _minimal_ext_cmd(['git', 'describe', PRODUCTION_BRANCH])
-        major_minor_revision = out.strip().decode('ascii').split('-')
-        major_minor = major_minor_revision[0].split('.')
-        major = int(major_minor[0])
-        if len(major_minor) > 1:
-            minor = int(major_minor[1])
-            # All the remaining numbers will be added together in the version number
-            if len(major_minor) > 2:
-                for i in range(2, len(major_minor)):
-                    revision += int(major_minor[i])
-
-        # The number of commits is added to the revision number
-        if len(major_minor_revision) > 1:
-            revision += int(major_minor_revision[1])
-
-        # If not in the 'production' branch then extract the number of commits to 'development', not in 'production'
-        if branch != 'production':
-            out = _minimal_ext_cmd(['git', 'log', DEVELOPMENT_BRANCH, '^{}'.format(PRODUCTION_BRANCH), '--format="%h"'])
-            commits = len(out.strip().decode('utf-8').split('\n'))
-
-            revision = n_pairing(revision, commits)
-
+        branch_id = 0
         branch_commits = 0
 
-        # If the branch is not the 'development' or 'production' branch then add the number of commits and the short
-        # hash of the commit identifier of the branch
-        if branch not in ['master', 'production']:
-            out = _minimal_ext_cmd(['git', 'log', branch, '^master', '--format="%h"'])
-            branch_commits = len(out.strip().decode('utf-8').split('\n'))
+        # Get the last tag of the branch
+        out = _minimal_ext_cmd(['git', 'describe', '--abbrev=0', branch])
+        tag = out.strip().decode('utf-8')
 
-            # Convert the branch name into a four-digit hashed value. Use the hashlib for consistency
-            branch = int(hashlib.sha1(branch.encode('utf-8')).hexdigest(), 16) % 10 ** 4
+        production_commits = 0
 
-        if branch_commits > 0:
-            version = '{}.{}.{}.{}-{}'.format(major, minor, revision, branch, branch_commits)
-        elif revision > 0:
-            version = '{}.{}.{}'.format(major, minor, revision)
+        if tag != '' and not tag.startswith('fatal'):
+            out = _minimal_ext_cmd(['git', 'merge-base', branch, tag])
+            first_hash = out.strip().decode('utf-8')
+            tag_components = tag.split('.')
+            major = int(tag_components[0])
+            minor = 0
+            if len(tag_components) > 1:
+                minor = int(tag_components[1])
+            if len(tag_components) > 2:
+                for i in range(2, len(tag_components)):
+                    production_commits += int(tag_components[i])
         else:
-            version = '{}.{}'.format(major, minor)
+            out = _minimal_ext_cmd(['git', 'rev-list', '--max-parents=0', '--date-order', '--reverse', 'HEAD'])
+            first_hash = out.strip().decode('utf-8').split('\n')[0]
+
+        production_and_branch_ancestor = _minimal_ext_cmd(['git', 'merge-base',
+                                                           PRODUCTION_BRANCH, branch]).strip().decode('utf-8')
+
+        for commit in _minimal_ext_cmd(['git', 'log', '--format="%h"',
+                                        '{}..{}'.format(first_hash,
+                                                        production_and_branch_ancestor)
+                                        ]).strip().decode('utf-8').split('\n'):
+            if commit.strip() != '':
+                production_commits += 1
+
+        revision += production_commits
+        if revision > 0:
+            version = "{}.{}.{}".format(major, minor, revision)
+        else:
+            version = "{}.{}".format(major, minor)
+
+        if branch != PRODUCTION_BRANCH:
+            development_and_branch_ancestor = _minimal_ext_cmd(['git', 'merge-base',
+                                                                DEVELOPMENT_BRANCH, branch]).strip().decode('utf-8')
+
+            development_commits = 0
+            for commit in _minimal_ext_cmd(['git', 'log', '--format="%h"',
+                                            '{}..{}'.format(production_and_branch_ancestor,
+                                                            development_and_branch_ancestor)
+                                            ]).strip().decode('utf-8').split('\n'):
+                if commit.strip() != '':
+                    development_commits += 1
+
+            if development_commits > 0:
+                version = "{}.{}".format(version, development_commits)
+            if branch != DEVELOPMENT_BRANCH:
+                branch_commits = 0
+                branch_id = hash_branch_name(branch)
+                current_hash = _minimal_ext_cmd(['git', 'rev-parse', branch]).strip().decode('utf-8')
+                for commit in _minimal_ext_cmd(['git', 'log', '--format="%h"',
+                                                '{}..{}'.format(production_and_branch_ancestor
+                                                                if development_commits == 0
+                                                                else development_and_branch_ancestor,
+                                                                current_hash)
+                                                ]).strip().decode('utf-8').split('\n'):
+                    if commit.strip() != '':
+                        branch_commits += 1
+                if branch_commits > 0:
+                    version = "{}-{}".format(version, n_pairing(branch_commits, branch_id))
 
     except OSError:
         version = ''
