@@ -44,7 +44,7 @@ def git_version():
         revision = 0
 
         # Get the version number from the 'production' branch. Use the number of commits as revision
-        out = _minimal_ext_cmd(['git', 'describe', 'production'])
+        out = _minimal_ext_cmd(['git', 'describe', PRODUCTION_BRANCH])
         major_minor_revision = out.strip().decode('ascii').split('-')
         major_minor = major_minor_revision[0].split('.')
         major = int(major_minor[0])
@@ -59,17 +59,17 @@ def git_version():
         if len(major_minor_revision) > 1:
             revision += int(major_minor_revision[1])
 
-        # If not in the 'production' branch then extract the number of commits to 'master', not in 'production'
+        # If not in the 'production' branch then extract the number of commits to 'development', not in 'production'
         if branch != 'production':
-            out = _minimal_ext_cmd(['git', 'log', 'master', '^production', '--format="%h"'])
+            out = _minimal_ext_cmd(['git', 'log', DEVELOPMENT_BRANCH, '^{}'.format(PRODUCTION_BRANCH), '--format="%h"'])
             commits = len(out.strip().decode('utf-8').split('\n'))
 
             revision = n_pairing(revision, commits)
 
         branch_commits = 0
 
-        # If the branch is not the 'master' or 'production' branch then add the number of commits and the short hash of
-        # the commit identifier of the branch
+        # If the branch is not the 'development' or 'production' branch then add the number of commits and the short
+        # hash of the commit identifier of the branch
         if branch not in ['master', 'production']:
             out = _minimal_ext_cmd(['git', 'log', branch, '^master', '--format="%h"'])
             branch_commits = len(out.strip().decode('utf-8').split('\n'))
