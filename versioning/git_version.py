@@ -46,7 +46,7 @@ def git_version():
             tag = out.strip().decode('utf-8')
             tag_commits_hash = tag.split('-')
             version = ((tag
-                        if len(tag_commits_hash) < 1 or int(tag_commits_hash[1]) == 0
+                        if len(tag_commits_hash) <1 or int(tag_commits_hash[1]) > 0
                         else tag_commits_hash[0])
                        if tag != '' and not tag.startswith('fatal')
                        else DEFAULT_VERSION)
