@@ -44,44 +44,58 @@ def update_git_version(update='+', push=False):
         out = minimal_ext_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
         branch = out.strip().decode('ascii').lower()
         if branch not in MAIN_BRANCHES:
-            print('The version cannot be incremented from a feature or hotfix branch')
+            raise ValueError('The version cannot be incremented from a feature or hotfix branch')
         else:
-            version = git_version()
-            if version == '':
+            out = minimal_ext_cmd(['git', 'describe'])
+            tag = out.strip().decode('utf-8')
+            branch_commits = 0
+
+            if tag != '' and not tag.startswith('fatal'):
+                tag_commits_hash = tag.split('-')
+                if len(tag_commits_hash) > 1:
+                    version = tag_commits_hash[0]
+                    branch_commits = int(tag_commits_hash[1])
+                else:
+                    version = tag
+            else:
                 raise ValueError('Could not get the current version')
-            major_minor_revision = version.split('.')
-            major = int(major_minor_revision[0])
-            if len(major_minor_revision) > 1:
-                minor = int(major_minor_revision[1])
-            elif major > 0:
-                minor = 0
+
+            if branch_commits == 0:
+                raise ValueError('Cannot increment the version when there are no changes')
             else:
-                minor = 1
-            message = ''
-            if len(major_minor_revision) > 2:
-                revision = int(major_minor_revision[2])
-            else:
-                revision = 0
-            if update == '+':
-                revision += 1
-                message = 'Revision {}'
-            elif update == '++':
-                minor += 1
-                revision = 0
-                message = 'Release {}'
-            elif update == '+++':
-                major += 1
-                minor = 0
-                revision = 0
-                message = 'Release {}'
-            if revision > 0:
-                new_version = '{}.{}.{}'.format(major, minor, revision)
-            else:
-                new_version = '{}.{}'.format(major, minor)
-            if version != new_version:
-                minimal_ext_cmd(['git', 'tag', '-a', '-m', message.format(new_version), new_version])
-                print('Created tag {} for {}'.format(new_version, branch))
-                if push:
-                    minimal_ext_cmd(['git', 'push', '--tags'])
+                major_minor_revision = version.split('.')
+                major = int(major_minor_revision[0])
+                if len(major_minor_revision) > 1:
+                    minor = int(major_minor_revision[1])
+                elif major > 0:
+                    minor = 0
+                else:
+                    minor = 1
+                message = ''
+                if len(major_minor_revision) > 2:
+                    revision = int(major_minor_revision[2])
+                else:
+                    revision = 0
+                if update == '+':
+                    revision += 1
+                    message = 'Revision {}'
+                elif update == '++':
+                    minor += 1
+                    revision = 0
+                    message = 'Release {}'
+                elif update == '+++':
+                    major += 1
+                    minor = 0
+                    revision = 0
+                    message = 'Release {}'
+                if revision > 0:
+                    new_version = '{}.{}.{}'.format(major, minor, revision)
+                else:
+                    new_version = '{}.{}'.format(major, minor)
+                if version != new_version:
+                    minimal_ext_cmd(['git', 'tag', '-a', '-m', message.format(new_version), new_version])
+                    print('Created tag {} for {}'.format(new_version, branch))
+                    if push:
+                        minimal_ext_cmd(['git', 'push', '--tags'])
     except OSError:
-        print('The version number could not be updated')
+        raise ValueError('The version number could not be updated')
