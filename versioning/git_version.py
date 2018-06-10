@@ -80,7 +80,7 @@ def update_git_version(update='+'):
                 new_version = '{}.{}'.format(major, minor)
             if version != new_version:
                 minimal_ext_cmd(['git', 'tag', '-a', '-m', message.format(new_version), new_version])
-                print('Created tag {} for {}'.format(version, branch))
+                print('Created tag {} for {}'.format(new_version, branch))
                 minimal_ext_cmd(['git', 'push', '--tags'])
     except OSError:
         print('The version number could not be updated')
