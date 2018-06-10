@@ -38,7 +38,7 @@ def git_version():
     return version
 
 
-def update_git_version(update='+'):
+def update_git_version(update='+', push=False):
     try:
         # Extract the current branch name
         out = minimal_ext_cmd(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
@@ -81,6 +81,7 @@ def update_git_version(update='+'):
             if version != new_version:
                 minimal_ext_cmd(['git', 'tag', '-a', '-m', message.format(new_version), new_version])
                 print('Created tag {} for {}'.format(new_version, branch))
-                minimal_ext_cmd(['git', 'push', '--tags'])
+                if push:
+                    minimal_ext_cmd(['git', 'push', '--tags'])
     except OSError:
         print('The version number could not be updated')
