@@ -1,7 +1,10 @@
 from . import minimal_ext_cmd
 
-MAIN_BRANCHES = {'master', 'production'}
+PRODUCTION_BRANCH = 'production'
+DEVELOPMENT_BRANCH = 'master'
+MAIN_BRANCHES = {DEVELOPMENT_BRANCH, PRODUCTION_BRANCH}
 DEFAULT_VERSION = '0.1'
+HOTFIX_STARTNAME = 'rev'
 
 
 # Return the git revision as a string
@@ -72,24 +75,32 @@ def update_git_version(update='+', push=False):
                 else:
                     minor = 1
                 message = ''
+                post = ''
                 if len(major_minor_revision) > 2:
-                    revision = int(major_minor_revision[2])
+                    if major_minor_revision[2].startswith(HOTFIX_STARTNAME):
+                        post = HOTFIX_STARTNAME
+                        revision = int(major_minor_revision[2][len(HOTFIX_STARTNAME):])
+                    else:
+                        revision = int(major_minor_revision[2])
                 else:
                     revision = 0
+                if post != '':
+                    message = 'Hotfix {}'
+                elif branch == DEVELOPMENT_BRANCH:
+                    message = 'Revision {}'
+                elif branch == PRODUCTION_BRANCH:
+                    message = 'Release {}'
                 if update == '+':
                     revision += 1
-                    message = 'Revision {}'
                 elif update == '++':
                     minor += 1
                     revision = 0
-                    message = 'Release {}'
                 elif update == '+++':
                     major += 1
                     minor = 0
                     revision = 0
-                    message = 'Release {}'
                 if revision > 0:
-                    new_version = '{}.{}.{}'.format(major, minor, revision)
+                    new_version = '{}.{}.{}{}'.format(major, minor, post, revision)
                 else:
                     new_version = '{}.{}'.format(major, minor)
                 if version != new_version:
