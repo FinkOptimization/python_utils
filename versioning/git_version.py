@@ -49,9 +49,9 @@ def update_git_version(update='+', push=False):
             else:
                 raise ValueError('Could not get the current version')
 
-            version_commits_hash = tag[len(current_version):].split('-')
-            if version_commits_hash[0] != '':
-                branch_commits = int(version_commits_hash[0])
+            version_commits_hash = current_version[len(version):].split('-')
+            if len(version_commits_hash) > 0 and version_commits_hash[1] != '':
+                branch_commits = int(version_commits_hash[1])
 
             if branch_commits == 0:
                 raise ValueError('Cannot increment the version when there are no changes')
