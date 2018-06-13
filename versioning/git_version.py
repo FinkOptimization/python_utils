@@ -66,18 +66,21 @@ def update_git_version(update='+', push=False):
                     minor = 1
                 message = ''
                 revision = 0
+                hotfix = 0
 
                 if len(major_minor_revision) > 2:
                     if major_minor_revision[2].startswith(HOTFIX_STARTNAME):
-                        revision = int(major_minor_revision[2][len(HOTFIX_STARTNAME):])
+                        hotfix = int(major_minor_revision[2][len(HOTFIX_STARTNAME):])
                     else:
                         revision = int(major_minor_revision[2])
 
                 post = ''
                 if update == '+':
-                    revision += 1
                     if post == '' and branch == PRODUCTION_BRANCH:
                         post = HOTFIX_STARTNAME
+                        hotfix += 1
+                    else:
+                        revision += 1
                 elif update == '++':
                     minor += 1
                     revision = 0
@@ -93,9 +96,9 @@ def update_git_version(update='+', push=False):
                 elif branch == PRODUCTION_BRANCH:
                     message = 'Release {}'
 
-                if revision > 0:
+                if revision + hotfix > 0:
                     if post != '':
-                        new_version = '{}.{}-{}{}'.format(major, minor, post, revision)
+                        new_version = '{}.{}-{}{}'.format(major, minor, post, hotfix)
                     else:
                         new_version = '{}.{}.{}'.format(major, minor, revision)
                 else:
