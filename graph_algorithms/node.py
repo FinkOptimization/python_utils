@@ -22,14 +22,28 @@
 # SOFTWARE.
 
 import math
+from collections import Iterable
+from iterable import first
 
 
 class Node:
     def __init__(self, name: str = ""):
         self.name = name
-        self.adjacent = set()  # type: set[Node]
+        self.adjacent = []
         self.degeneracy_cell_index = 0
         self.visited = False
+
+    def add_adjacent(self, *args):
+        for element in args:
+            if isinstance(element, Iterable):
+                for node in element:
+                    self.add_adjacent(node)
+            elif isinstance(element, Node):
+                self.adjacent.append(element)
+            else:
+                raise ValueError(
+                    'Input must either be of class node or an iterable of Node. Received {} instead'.format(
+                        type(element)))
     
     def __str__(self):
         return self.name
@@ -117,7 +131,10 @@ def get_degeneracy_ordering(nodes) -> (int, [Node]):
             smallest_index += 1
         if smallest_index > degeneracy_number:
             degeneracy_number = smallest_index
-        node = next(iter(nodes_of_degree[smallest_index]))
+        node = first(nodes_of_degree[smallest_index])
+        for n in nodes_of_degree[smallest_index]:
+            if n.name < node.name:
+                node = n
         nodes_of_degree[smallest_index].remove(node)
         node.visited = True
         for n in node.adjacent:

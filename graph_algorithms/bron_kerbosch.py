@@ -22,6 +22,8 @@
 # SOFTWARE.
 
 
+from typing import Set
+from math import pow
 from . import Node, get_degeneracy_ordering, get_components
 
 
@@ -32,31 +34,32 @@ def get_cliques_bron_kerbosch(nodes):
         x = set()
         _, nodes_ordered = get_degeneracy_ordering(component)
         for v in nodes_ordered:
-            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
+            for clique in bron_kerbosch(r | {v}, p.intersection(v.adjacent), x.intersection(v.adjacent)):
                 yield clique
             p.remove(v)
             x.add(v)
 
 
-def bron_kerbosch(
-        r,  # type: set[Node]
-        p,  # type: set[Node]
-        x,  # type: set[Node]
-):
+def bron_kerbosch(r: Set[Node], p: Set[Node], x: Set[Node]):
     if len(p) == len(x) == 0:
         yield r
     else:
         px = p | x
         u = px.pop()
-        adjacency = len([n for n in u.adjacent if n in p])
+        adjacency = len(p.intersection(u.adjacent))
         for node in px:
-            local_adjacency = len(node.adjacent & p)
+            local_adjacency = len(p.intersection(node.adjacent))
             if local_adjacency > adjacency:
                 adjacency = local_adjacency
                 u = node
-        iter_nodes = p - u.adjacent
+        iter_nodes = p.difference(u.adjacent)
         for v in iter_nodes:
-            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
+            for clique in bron_kerbosch(r | {v}, p.intersection(v.adjacent), x.intersection(v.adjacent)):
                 yield clique
             p.remove(v)
             x.add(v)
+
+
+def worst_case_running_time_bron_kerbosch(nodes):
+    d, _ = get_degeneracy_ordering(nodes)
+    return d * len(nodes) * pow(3, d / 3)

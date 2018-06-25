@@ -22,6 +22,7 @@
 # SOFTWARE.
 
 
+from math import pow
 from . import get_components, get_degeneracy_ordering
 
 
@@ -133,3 +134,7 @@ def _get_cliques_kellerman(nodes_list):
     return [{nodes[n]
              for n in clique}
             for clique in cliques]
+
+
+def worst_case_running_time_kellerman(nodes):
+    return len(nodes) * pow(sum([len(node.adjacent) for node in nodes]) / 2, 2)

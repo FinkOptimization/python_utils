@@ -22,12 +22,11 @@
 # SOFTWARE.
 
 import unittest
-import math
 
-from .. import Node, get_cliques_kellerman
+from .. import Node, get_cliques_kellerman, worst_case_running_time_kellerman
 
 
-class TestBasicKouStockMeyerWongFunctionality(unittest.TestCase):
+class TestKellermanFunctionality(unittest.TestCase):
     def test_finding_cliques_in_small_graph(self):
         
         """
@@ -50,15 +49,14 @@ class TestBasicKouStockMeyerWongFunctionality(unittest.TestCase):
             3, 5
         """
         nodes = [Node(str(i)) for i in range(6)]
-        nodes[0].adjacent.update({nodes[1], nodes[4]})
-        nodes[1].adjacent.update({nodes[0], nodes[2], nodes[4]})
-        nodes[2].adjacent.update({nodes[1], nodes[3]})
-        nodes[3].adjacent.update({nodes[2], nodes[4], nodes[5]})
-        nodes[4].adjacent.update({nodes[0], nodes[1], nodes[3]})
-        nodes[5].adjacent.update({nodes[3]})
+        nodes[0].add_adjacent(nodes[1], nodes[4])
+        nodes[1].add_adjacent(nodes[0], nodes[2], nodes[4])
+        nodes[2].add_adjacent(nodes[1], nodes[3])
+        nodes[3].add_adjacent(nodes[2], nodes[4], nodes[5])
+        nodes[4].add_adjacent(nodes[0], nodes[1], nodes[3])
+        nodes[5].add_adjacent(nodes[3])
         
-        print("Kellerman worst case run time: O(n * m) = {}".format(
-            len(nodes) * math.pow(sum([len(node.adjacent) for node in nodes]) / 2, 2)))
+        print("Kellerman worst case run time: O(n * m) = O({})".format(worst_case_running_time_kellerman(nodes)))
 
         cliques = [clique for clique in get_cliques_kellerman(nodes)]
         

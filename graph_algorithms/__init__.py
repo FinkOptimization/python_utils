@@ -29,7 +29,9 @@ from .node import \
     get_components
 
 from .bron_kerbosch import \
-    get_cliques_bron_kerbosch
+    get_cliques_bron_kerbosch, \
+    worst_case_running_time_bron_kerbosch
 
 from .kellerman import \
-    get_cliques_kellerman
+    get_cliques_kellerman, \
+    worst_case_running_time_kellerman
