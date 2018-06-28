@@ -24,20 +24,22 @@
 
 from typing import Set
 from math import pow
-from . import Node, get_degeneracy_ordering, get_components
+from . import Node, get_degeneracy_ordering
 
 
-def get_cliques_bron_kerbosch(nodes):
-    for component in get_components(nodes):
-        p = set(component)
-        r = set()
-        x = set()
-        _, nodes_ordered = get_degeneracy_ordering(component)
-        for v in nodes_ordered:
-            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
-                yield clique
-            p.remove(v)
-            x.add(v)
+def get_cliques_bron_kerbosch(nodes, ordered_nodes=False):
+    p = set(nodes)
+    r = set()
+    x = set()
+    if ordered_nodes:
+        nodes_ordered = nodes
+    else:
+        _, nodes_ordered = get_degeneracy_ordering(nodes)
+    for v in nodes_ordered:
+        for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
+            yield clique
+        p.remove(v)
+        x.add(v)
 
 
 def bron_kerbosch(r: Set[Node], p: Set[Node], x: Set[Node]):
@@ -60,6 +62,7 @@ def bron_kerbosch(r: Set[Node], p: Set[Node], x: Set[Node]):
             x.add(v)
 
 
-def worst_case_running_time_bron_kerbosch(nodes):
-    d, _ = get_degeneracy_ordering(nodes)
+def worst_case_running_time_bron_kerbosch(nodes, d=None):
+    if not d:
+        d, _ = get_degeneracy_ordering(nodes)
     return d * len(nodes) * pow(3, d / 3)

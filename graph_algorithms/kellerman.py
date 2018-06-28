@@ -26,15 +26,18 @@ from math import pow
 from . import get_components, get_degeneracy_ordering
 
 
-def get_cliques_kellerman(nodes):
+def get_cliques_kellerman(nodes, ordered_nodes=False):
     for component in get_components(nodes):
-        for clique in _get_cliques_kellerman(component):
+        for clique in _get_cliques_kellerman(component, ordered_nodes):
             yield clique
 
 
-def _get_cliques_kellerman(nodes_list):
+def _get_cliques_kellerman(nodes_list, ordered_nodes):
     cliques = []  # type: [set[int]]
-    _, nodes = get_degeneracy_ordering(nodes_list)
+    if ordered_nodes:
+        nodes = nodes_list
+    else:
+        _, nodes = get_degeneracy_ordering(nodes_list)
     neighbours_less_uncovered = []
     neighbours_less = []
     neighbours_greater = []

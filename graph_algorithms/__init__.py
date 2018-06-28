@@ -35,3 +35,11 @@ from .bron_kerbosch import \
 from .kellerman import \
     get_cliques_kellerman, \
     worst_case_running_time_kellerman
+
+
+def get_cliques(nodes):
+    d, nodes_ordered = get_degeneracy_ordering(nodes)
+    if worst_case_running_time_bron_kerbosch(nodes_ordered, d) < worst_case_running_time_kellerman(nodes_ordered):
+        return get_cliques_bron_kerbosch(nodes_ordered, True)
+    else:
+        return get_cliques_kellerman(nodes_ordered, True)
