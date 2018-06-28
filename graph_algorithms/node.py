@@ -29,7 +29,7 @@ from iterable import first
 class Node:
     def __init__(self, name: str = ""):
         self.name = name
-        self.adjacent = []
+        self.adjacent = set()
         self.degeneracy_cell_index = 0
         self.visited = False
 
@@ -39,7 +39,7 @@ class Node:
                 for node in element:
                     self.add_adjacent(node)
             elif isinstance(element, Node):
-                self.adjacent.append(element)
+                self.adjacent.add(element)
             else:
                 raise ValueError(
                     'Input must either be of class node or an iterable of Node. Received {} instead'.format(
@@ -48,8 +48,7 @@ class Node:
     def __str__(self):
         return self.name
     
-    def __repr__(self):
-        return self.name
+    __repr__ = __str__
 
 
 def print_statistics(nodes: [Node]):

@@ -34,7 +34,7 @@ def get_cliques_bron_kerbosch(nodes):
         x = set()
         _, nodes_ordered = get_degeneracy_ordering(component)
         for v in nodes_ordered:
-            for clique in bron_kerbosch(r | {v}, p.intersection(v.adjacent), x.intersection(v.adjacent)):
+            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
                 yield clique
             p.remove(v)
             x.add(v)
@@ -46,15 +46,15 @@ def bron_kerbosch(r: Set[Node], p: Set[Node], x: Set[Node]):
     else:
         px = p | x
         u = px.pop()
-        adjacency = len(p.intersection(u.adjacent))
+        adjacency = len(p & u.adjacent)
         for node in px:
-            local_adjacency = len(p.intersection(node.adjacent))
+            local_adjacency = len(p & node.adjacent)
             if local_adjacency > adjacency:
                 adjacency = local_adjacency
                 u = node
-        iter_nodes = p.difference(u.adjacent)
-        for v in iter_nodes:
-            for clique in bron_kerbosch(r | {v}, p.intersection(v.adjacent), x.intersection(v.adjacent)):
+        iter_nodes = p - u.adjacent
+        for v in sorted(iter_nodes, key=lambda x: x.name):
+            for clique in bron_kerbosch(r | {v}, p & v.adjacent, x & v.adjacent):
                 yield clique
             p.remove(v)
             x.add(v)
